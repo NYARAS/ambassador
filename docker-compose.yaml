@@ -1,8 +1,25 @@
-version: "3.9"
+version: '3.9'
 services:
   backend:
     build: .
     ports:
-      - 8000:8000
+    - 8000:8000
     volumes:
-      - .:/app
+    - .:/app
+    depends_on:
+     - db
+
+  db:
+    container_name: ambassador
+    image: postgres:12.8
+    restart: always
+    environment:
+      - POSTGRES_USER=pg
+      - POSTGRES_PASSWORD=pleasechangeme
+      - POSTGRES_DB=ambassador
+    ports:
+      - 5433:5432
+    volumes:
+      - db:/var/lib/postgresql/data 
+volumes:
+  db:
