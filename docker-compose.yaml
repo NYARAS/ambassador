@@ -11,15 +11,13 @@ services:
 
   db:
     container_name: ambassador
-    image: postgres:12.8
+    image: postgres:14.1
     restart: always
     environment:
-      - POSTGRES_USER=pg
+      - POSTGRES_USER=ambassador
       - POSTGRES_PASSWORD=pleasechangeme
       - POSTGRES_DB=ambassador
     ports:
       - 5433:5432
     volumes:
-      - db:/var/lib/postgresql/data 
-volumes:
-  db:
+      - ./tmp/db:/var/lib/postgresql/data
