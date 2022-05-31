@@ -4,6 +4,7 @@ import (
 	"github.com/NYARAS/go-ambassador/src/database"
 	"github.com/NYARAS/go-ambassador/src/routes"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
@@ -12,6 +13,11 @@ func main() {
 	database.AutoMigrate()
 
 	app := fiber.New()
+
+	// Enable and allow credentials - allow the frontend to get cookies from backend
+	app.Use(cors.New(cors.Config{
+		AllowCredentials: true,
+	}))
 
 	routes.Setup(app)
 
