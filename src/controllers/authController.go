@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/NYARAS/go-ambassador/src/database"
+	"github.com/NYARAS/go-ambassador/src/middlewares"
 	"github.com/NYARAS/go-ambassador/src/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
@@ -95,24 +96,11 @@ func Login(ctx *fiber.Ctx) error {
 }
 
 func User(ctx *fiber.Ctx) error {
-	cookie := ctx.Cookies("jwt")
-
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(t *jwt.Token) (interface{}, error) {
-		return []byte("secret"), nil
-	})
-
-	if err != nil || !token.Valid {
-		ctx.Status(fiber.StatusUnauthorized)
-		return ctx.JSON(fiber.Map{
-			"message": "unauthenticated!",
-		})
-	}
-
-	payload := token.Claims.(*jwt.StandardClaims)
+	id, _ := middlewares.GetUserId(ctx)
 
 	var user models.User
 
-	database.DB.Where("id = ?", payload.Subject).First(&user)
+	database.DB.Where("id = ?", id).First(&user)
 
 	return ctx.JSON(user)
 }
