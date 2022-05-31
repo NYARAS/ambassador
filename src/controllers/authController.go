@@ -8,7 +8,6 @@ import (
 	"github.com/NYARAS/go-ambassador/src/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(ctx *fiber.Ctx) error {
@@ -26,15 +25,14 @@ func Register(ctx *fiber.Ctx) error {
 		})
 	}
 
-	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 12)
-
 	user := models.User{
 		FirstName:    data["first_name"],
 		LastName:     data["last_name"],
 		Email:        data["email"],
-		Password:     password,
 		IsAmbassador: false,
 	}
+
+	user.SetPassword(data["password"])
 
 	database.DB.Create(&user)
 
@@ -59,7 +57,7 @@ func Login(ctx *fiber.Ctx) error {
 		})
 	}
 
-	err = bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"]))
+	err = user.ComparePassword(data["password"])
 	if err != nil {
 		ctx.Status(fiber.StatusBadRequest)
 		return ctx.JSON(fiber.Map{
