@@ -141,3 +141,31 @@ func UpdateInfo(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(user)
 }
+
+func UpdatePassword(ctx *fiber.Ctx) error {
+	var data map[string]string
+
+	err := ctx.BodyParser(&data)
+	if err != nil {
+		return err
+	}
+
+	if data["password"] != data["password_confirm"] {
+		ctx.Status(400)
+		return ctx.JSON(fiber.Map{
+			"message": "passwords do not match",
+		})
+	}
+
+	id, _ := middlewares.GetUserId(ctx)
+
+	user := models.User{
+		Id: id,
+	}
+
+	user.SetPassword(data["password"])
+
+	database.DB.Model(&user).Updates(&user)
+
+	return ctx.JSON(user)
+}
