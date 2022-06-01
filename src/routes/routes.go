@@ -20,5 +20,6 @@ func Setup(app *fiber.App) {
 	adminAuthenicated.Put("users/password", controllers.UpdatePassword)
 	adminAuthenicated.Get("ambassadors", controllers.Ambassador)
 	adminAuthenicated.Get("products", controllers.Products)
-	adminAuthenicated.Post("product", controllers.CreateProduct)
+	adminAuthenicated.Post("products", controllers.CreateProduct)
+	adminAuthenicated.Get("products/:id", controllers.GetProduct)
 }

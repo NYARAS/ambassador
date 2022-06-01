@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"strconv"
+
 	"github.com/NYARAS/go-ambassador/src/database"
 	"github.com/NYARAS/go-ambassador/src/models"
 	"github.com/gofiber/fiber/v2"
@@ -22,6 +24,18 @@ func CreateProduct(ctx *fiber.Ctx) error {
 	}
 
 	database.DB.Create(&product)
+
+	return ctx.JSON(product)
+}
+
+func GetProduct(ctx *fiber.Ctx) error {
+	var product models.Product
+
+	id, _ := strconv.Atoi(ctx.Params("id"))
+
+	product.Id = uint(id)
+
+	database.DB.Find(&product)
 
 	return ctx.JSON(product)
 }
