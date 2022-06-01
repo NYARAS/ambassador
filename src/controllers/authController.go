@@ -119,3 +119,25 @@ func Logout(ctx *fiber.Ctx) error {
 		"message": "Logout successfully",
 	})
 }
+
+func UpdateInfo(ctx *fiber.Ctx) error {
+	var data map[string]string
+
+	err := ctx.BodyParser(&data)
+	if err != nil {
+		return err
+	}
+
+	id, _ := middlewares.GetUserId(ctx)
+
+	user := models.User{
+		Id:        id,
+		FirstName: data["first_name"],
+		LastName:  data["last_name"],
+		Email:     data["email"],
+	}
+
+	database.DB.Model(&user).Updates(&user)
+
+	return ctx.JSON(user)
+}
