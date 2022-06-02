@@ -22,4 +22,6 @@ func Setup(app *fiber.App) {
 	adminAuthenicated.Get("products", controllers.Products)
 	adminAuthenicated.Post("products", controllers.CreateProduct)
 	adminAuthenicated.Get("products/:id", controllers.GetProduct)
+	adminAuthenicated.Put("products/:id", controllers.UpdateProduct)
+	adminAuthenicated.Delete("products/:id", controllers.DeleteProduct)
 }
