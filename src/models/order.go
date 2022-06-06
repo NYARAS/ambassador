@@ -14,7 +14,7 @@ type Order struct {
 	City            string      `json:"city" gorm:"null"`
 	Country         string      `json:"country" gorm:"null"`
 	Zip             string      `json:"zip" gorm:"null"`
-	Complete        bool        `json:"complete" gorm:"default:false"`
+	Complete        bool        `json:"-" gorm:"default:false"`
 	Total           float64     `json:"total" gorm:"-"`
 	OrderItems      []OrderItem `json:"order_items" gorm:"foreignKey:OrderId"`
 }
@@ -31,4 +31,14 @@ type OrderItem struct {
 
 func (order *Order) FullName() string {
 	return order.FirstName + " " + order.LastName
+}
+
+func (order *Order) GetTotal() float64 {
+	var total float64 = 0
+
+	for _, orderItem := range order.OrderItems {
+		total += orderItem.Price * float64(orderItem.Quantity)
+	}
+
+	return total
 }

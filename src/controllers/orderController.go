@@ -13,6 +13,7 @@ func Orders(ctx *fiber.Ctx) error {
 
 	for i, order := range orders {
 		orders[i].Name = order.FirstName
+		orders[i].Total = order.GetTotal()
 	}
 	return ctx.JSON(orders)
 }
