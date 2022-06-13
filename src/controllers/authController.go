@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/NYARAS/go-ambassador/src/database"
@@ -30,7 +31,7 @@ func Register(ctx *fiber.Ctx) error {
 		FirstName:    data["first_name"],
 		LastName:     data["last_name"],
 		Email:        data["email"],
-		IsAmbassador: false,
+		IsAmbassador: strings.Contains(ctx.Path(), "/api/ambassador"),
 	}
 
 	user.SetPassword(data["password"])
