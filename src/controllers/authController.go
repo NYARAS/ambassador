@@ -1,14 +1,12 @@
 package controllers
 
 import (
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/NYARAS/go-ambassador/src/database"
 	"github.com/NYARAS/go-ambassador/src/middlewares"
 	"github.com/NYARAS/go-ambassador/src/models"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -67,13 +65,16 @@ func Login(ctx *fiber.Ctx) error {
 		})
 	}
 
-	payload := jwt.StandardClaims{
-		Subject:   strconv.Itoa(int(user.Id)),
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+	isAmbassador := strings.Contains(ctx.Path(), "/api/ambassador")
+
+	var scope string
+
+	if isAmbassador {
+		scope = "ambassador"
+	} else {
+		scope = "admin"
 	}
-
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, payload).SignedString([]byte("secret"))
-
+	token, err := middlewares.GenerateJWT(user.Id, scope)
 	if err != nil {
 		ctx.Status(fiber.StatusBadRequest)
 		return ctx.JSON(fiber.Map{
