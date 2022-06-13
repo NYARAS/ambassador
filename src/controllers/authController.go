@@ -74,6 +74,13 @@ func Login(ctx *fiber.Ctx) error {
 	} else {
 		scope = "admin"
 	}
+	if !isAmbassador && user.IsAmbassador {
+		ctx.Status(fiber.StatusUnauthorized)
+		return ctx.JSON(fiber.Map{
+			"message": "unauthorized",
+		})
+	}
+
 	token, err := middlewares.GenerateJWT(user.Id, scope)
 	if err != nil {
 		ctx.Status(fiber.StatusBadRequest)
