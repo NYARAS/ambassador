@@ -1,0 +1,2 @@
+# ambassador
+Golang REST API 
