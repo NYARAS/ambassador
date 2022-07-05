@@ -3,6 +3,7 @@ module github.com/NYARAS/go-ambassador
 go 1.17
 
 require (
+	github.com/bxcodec/faker/v3 v3.8.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gofiber/fiber/v2 v2.34.0
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
@@ -11,8 +12,13 @@ require (
 )
 
 require (
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+)
+
+require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/bxcodec/faker/v3 v3.8.0 // indirect
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.12.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
