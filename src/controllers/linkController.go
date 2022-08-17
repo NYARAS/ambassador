@@ -4,7 +4,9 @@ import (
 	"strconv"
 
 	"github.com/NYARAS/go-ambassador/src/database"
+	"github.com/NYARAS/go-ambassador/src/middlewares"
 	"github.com/NYARAS/go-ambassador/src/models"
+	"github.com/bxcodec/faker/v3"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -24,4 +26,68 @@ func Link(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.JSON(links)
+}
+
+type CreateLinkRequest struct {
+	Products []int
+}
+
+func CreateLink(ctx *fiber.Ctx) error {
+	var request CreateLinkRequest
+
+	if err := ctx.BodyParser(&request); err != nil {
+		return err
+	}
+
+	id, _ := middlewares.GetUserId(ctx)
+
+	link := models.Link{
+		UserId: id,
+		Code:   faker.Username(),
+	}
+
+	for _, productId := range request.Products {
+		product := models.Product{}
+		product.Id = uint(productId)
+		link.Products = append(link.Products, product)
+	}
+
+	database.DB.Create(&link)
+
+	return ctx.JSON(link)
+}
+
+func Stats(ctx *fiber.Ctx) error {
+	id, _ := middlewares.GetUserId(ctx)
+
+	var links []models.Link
+
+	database.DB.Find(&links, models.Link{
+		UserId: id,
+	})
+
+	var result []interface{}
+
+	var orders []models.Order
+
+	for _, link := range links {
+		database.DB.Preload("OrderItems").Find(&orders, &models.Order{
+			Code:     link.Code,
+			Complete: true,
+		})
+
+		revenue := 0.0
+
+		for _, order := range orders {
+			revenue += order.GetTotal()
+		}
+
+		result = append(result, fiber.Map{
+			"code":    link.Code,
+			"count":   len(orders),
+			"revenue": revenue,
+		})
+	}
+
+	return ctx.JSON(result)
 }
