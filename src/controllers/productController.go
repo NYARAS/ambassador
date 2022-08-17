@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/NYARAS/go-ambassador/src/database"
@@ -95,4 +96,41 @@ func ProductFrontend(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.JSON(products)
+}
+
+func ProductBackend(ctx *fiber.Ctx) error {
+	var products []models.Product
+	var context = context.Background()
+
+	result, err := database.Cache.Get(context, "products_backend").Result()
+
+	if err != nil {
+		database.DB.Find(&products)
+
+		bytes, err := json.Marshal(products)
+
+		if err != nil {
+			panic(err)
+		}
+
+		database.Cache.Set(context, "products_backend", bytes, 30*time.Minute).Err()
+
+	} else {
+		json.Unmarshal([]byte(result), &products)
+	}
+
+	var searchProducts []models.Product
+
+	if s := ctx.Query("s"); s != "" {
+		lower := strings.ToLower(s)
+		for _, product := range products {
+			if strings.Contains(strings.ToLower(product.Title), lower) || strings.Contains(strings.ToLower(product.Description), lower) {
+				searchProducts = append(searchProducts, product)
+			}
+		}
+	} else {
+		searchProducts = products
+	}
+
+	return ctx.JSON(searchProducts)
 }
